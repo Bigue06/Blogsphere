@@ -1,48 +1,34 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import Home from "./Home";
-import Login from "./Login";
-import Register from "./Register";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./Pages/Home";
+import Login from "./Pages/Login";
+import Register from "./Pages/Register";
 import Profile from "./Profile";
-import Editor from "./Editor";
 import Dashboard from "./Dashboard";
-import Article from "./Article";
+import LesArticles from "./Pages/LesArticles";
+import Editor from "./Pages/Editor";
 
-const Layout = ({ children }) => {
-  const location = useLocation();
-  const hideLayout = ["/register", "/login"].includes(location.pathname);
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      {!hideLayout && <Navbar />}
-      <main className="flex-grow">{children}</main>
-      {!hideLayout && <Footer />}
-    </div>
-  );
-};
+import Layout from "./Layout/Layout";
 
 const App = () => {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/editor" element={<Editor />} />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+         <Route index element={<Home />} />
+          <Route path="/Home" element={<Home />} />
+
+        <Route path="/" element={<Layout />}>
+         
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/article/:id" element={<Article />} />
-          
-        </Routes>
-      </Layout>
+          <Route path="/profile/:username" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="articles" element={<LesArticles />} />
+          <Route path="editor" element={<Editor />} /> 
+        </Route>
+      </Routes>
     </Router>
   );
 };

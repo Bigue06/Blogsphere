@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../Api/AuthAPI';
 
 const Register = () => {
-  const [prenom, setPrenom] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -12,7 +13,7 @@ const Register = () => {
   const incription = (e) => {
     e.preventDefault();
 
-    if (!prenom || !email || !password || !confirmPassword) {
+    if (!username|| !email || !password || !confirmPassword) {
       alert("Veuillez remplir tous les champs");
       return;
     }
@@ -27,9 +28,29 @@ const Register = () => {
       return;
     }
 
-    localStorage.setItem("user", JSON.stringify({ prenom, email }));
+    localStorage.setItem("user", JSON.stringify({ username, email }));
     alert("Inscription réussie ! Bienvenue !");
     navigate("/profile");
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (!username || !email || !password || !confirmPassword) {
+      BiSolidCommentError("veiller remplir tous les champs");
+      return;
+    }
+    try{
+      const response = await registerUser({ username, email, password });
+      console.log("Inscription réussie :", response);
+      setUsername("");
+      setPassword("");
+      setEmail("");
+      setConfirmPassword("");
+    } catch (error) {
+      console.error("Erreur lors de l'inscription :", error);
+      alert("Une erreur s'est produite. Veuillez réessayer.");
+    }
   };
 
   return (
@@ -38,12 +59,12 @@ const Register = () => {
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Créer un compte</h1>
         <form onSubmit={incription} className="space-y-4">
           <div>
-            <label htmlFor="prenom" className="block text-sm font-medium text-gray-700">Prénom</label>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Prénom</label>
             <input
-              id="prenom"
+              id="username"
               type="text"
-              value={prenom}
-              onChange={(e) => setPrenom(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
           </div>
@@ -77,7 +98,7 @@ const Register = () => {
               className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
           </div>
-          <button
+          <button onClick={handleRegister}
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
           >

@@ -22,7 +22,7 @@ const Editor = () => {
 
     setTitre('');
     setContenu('');
-    navigate("/Article");
+    navigate("/LesArticles");
   };
 
   const handleCancel = () => {

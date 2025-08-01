@@ -1,15 +1,32 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate(); 
 
   const connexion = (e) => {
-    e.preventDefault();
-    alert("Connexion réussie !");
-    navigate("/profile"); 
+    e.preventDefault(); 
+    alert('Connexion réussie !'); 
+    navigate('/dashboard'); 
   };
 
+  const handleLogin = async (e) => {
+     e.preventDefault();
+ 
+     if ( !email || !password) {
+       BiSolidCommentError("veiller remplir tous les champs");
+       return;
+     }
+     try{
+       const response = await registerUser({  email, password });
+       console.log("Inscription réussie :", response);
+       setEmail("");
+       setPassword("");
+     } catch (error) {
+       console.error("Erreur lors de l'inscription :", error);
+       alert("Une erreur s'est produite. Veuillez réessayer.");
+     }
+   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 px-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
