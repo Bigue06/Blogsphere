@@ -13,3 +13,9 @@ export const loginUser = async (userData) => {
   const response = await axios.post(API_URL_LOGIN, userData);
   return response.data;
 };
+
+const API_URL_LOGOUT = "http://localhost:5000/api/auth/logout";
+export const logoutUser = async () => {
+  const response = await axios.post(API_URL_LOGOUT);
+  return response.data;
+};

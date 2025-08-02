@@ -2,72 +2,80 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const [articles, setArticles] = useState([]);
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [profile, setProfile] = useState(null);       
+  const [articles, setArticles] = useState([]);     
 
- 
   useEffect(() => {
-    fetch("http://localhost:3001/mes-articles") 
+    const storedUser = localStorage.getItem("username");
+    if (!storedUser) {
+      navigate("/login");
+      return;
+    }
+
+    setUsername(storedUser);
+
+   
+    fetch(`http://localhost:5000/api/auth/profile/${storedUser}`)
+      .then((res) => res.json())
+      .then((data) => setProfile(data))
+      .catch((err) =>
+        console.error("Erreur lors du chargement du profil :", err)
+      );
+
+    // Charger les articles de l'utilisateur
+    fetch(`http://localhost:5000/api/articles/user/${storedUser}`)
       .then((res) => res.json())
       .then((data) => setArticles(data))
-      .catch((err) => console.error("Erreur : ", err));
+      .catch((err) =>
+        console.error("Erreur lors du chargement des articles :", err)
+      );
   }, []);
 
-  const supprimerArticle = (id) => {
-    if (!window.confirm("Supprimer cet article ?")) return;
-
-    fetch(`http://localhost:3001/articles/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => {
-        setArticles(articles.filter((article) => article.id !== id));
-      })
-      .catch((err) => console.error("Erreur suppression", err));
+  const handleLogout = () => {
+    localStorage.clear();
+    alert("Déconnexion réussie !");
+    navigate("/login");
   };
 
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Mon tableau de bord</h1>
-        <button
-          onClick={() => navigate("/editor")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          + Nouvel article
-        </button>
-      </div>
+  const totalLikes = articles.reduce((acc, art) => acc + (art.likes || 0), 0);
+  const totalComments = articles.reduce((acc, art) => acc + (art.comments?.length || 0), 0);
 
-      {articles.length === 0 ? (
-        <p className="text-gray-500">Aucun article publié pour le moment.</p>
-      ) : (
-        <div className="space-y-4">
-          {articles.map((article) => (
-            <div
-              key={article.id}
-              className="bg-white p-4 rounded shadow-md flex justify-between items-center"
-            >
-              <div>
-                <h2 className="text-xl font-semibold">{article.titre}</h2>
-                <p className="text-gray-600 text-sm">{article.date}</p>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => navigate(`/editor/${article.id}`)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                >
-                  Modifier
-                </button>
-                <button
-                  onClick={() => supprimerArticle(article.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                >
-                  Supprimer
-                </button>
-              </div>
-            </div>
-          ))}
+  return (
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+      <div className="bg-white max-w-4xl mx-auto p-6 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold mb-4">
+          Bienvenue, {profile ? profile.name : username}
+        </h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-blue-100 p-4 rounded">
+            <h2 className="text-lg font-semibold">Articles</h2>
+            <p className="text-2xl">{articles.length}</p>
+          </div>
+          <div className="bg-green-100 p-4 rounded">
+            <h2 className="text-lg font-semibold">Likes</h2>
+            <p className="text-2xl">{totalLikes}</p>
+          </div>
+          <div className="bg-yellow-100 p-4 rounded">
+            <h2 className="text-lg font-semibold">Commentaires</h2>
+            <p className="text-2xl">{totalComments}</p>
+          </div>
         </div>
-      )}
+
+        <h2 className="text-xl font-semibold mb-2">Vos articles</h2>
+        {articles.map((a) => (
+          <div key={a._id} className="p-3 mb-3 border rounded bg-gray-50">
+            <h3 className="font-bold text-lg">{a.title}</h3>
+            <p className="text-sm text-gray-600">
+              Likes : {a.likes || 0} | Commentaires : {a.comments?.length || 0}
+            </p>
+          </div>
+        ))}
+
+        
+      </div>
     </div>
   );
 };

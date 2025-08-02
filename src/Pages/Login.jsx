@@ -1,59 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../Api/authAPI'; 
 
 const Login = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const connexion = (e) => {
-    e.preventDefault(); 
-    alert('Connexion réussie !'); 
-    navigate('/dashboard'); 
+  const connexion = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await loginUser({ email, password });
+      console.log('Connexion réussie:', response);
+
+     
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('username', response.user.username);
+      localStorage.setItem('email', response.user.email);
+
+    
+      setEmail('');
+      setPassword('');
+
+    
+      navigate('/Profile');
+    } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
+      alert('Identifiants invalides ou erreur serveur.');
+    }
   };
 
-  const handleLogin = async (e) => {
-     e.preventDefault();
- 
-     if ( !email || !password) {
-       BiSolidCommentError("veiller remplir tous les champs");
-       return;
-     }
-     try{
-       const response = await registerUser({  email, password });
-       console.log("Inscription réussie :", response);
-       setEmail("");
-       setPassword("");
-     } catch (error) {
-       console.error("Erreur lors de l'inscription :", error);
-       alert("Une erreur s'est produite. Veuillez réessayer.");
-     }
-   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 px-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Connexion à votre compte</h1>
         <form onSubmit={connexion} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Adresse Email</label>
+            <label htmlFor="email">Adresse Email</label>
             <input
               id="email"
               type="email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg"
               required
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+            <label htmlFor="password">Mot de passe</label>
             <input
               id="password"
               type="password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg"
               required
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
-          >
+          <button type="submit" className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg">
             Se connecter
           </button>
         </form>

@@ -1,48 +1,61 @@
-// src/Pages/Profile.jsx
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const { username } = useParams();
-  const [user, setUser] = useState(null);
-  const [articles, setArticles] = useState([]);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-   
-    fetch(`http://localhost:3001/users/${username}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data.user);
-        setArticles(data.articles || []);
-      })
-      .catch((err) => console.error("Erreur chargement profil :", err));
-  }, [username]);
+  const username = localStorage.getItem("username");
+  const email = localStorage.getItem("email");
+  const avatarUrl =
+    localStorage.getItem("avatar") || "https://ui-avatars.com/api/?name=" + username;
+  const bio = localStorage.getItem("bio") || "Décrivez-vous ici...";
 
-  if (!user) return <div className="p-8 text-center">Chargement du profil...</div>;
+  const handleEdit = () => {
+    navigate("/edit-profile");
+  };
+
+  const handleDelete = () => {
+    const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer votre profil ?");
+    if (confirmDelete) {
+      localStorage.removeItem("username");
+      localStorage.removeItem("email");
+      localStorage.removeItem("avatar");
+      localStorage.removeItem("bio");
+
+      navigate("/login");
+    }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">{user.name}</h1>
-        <p className="text-gray-600">{user.bio}</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 px-4">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md text-center">
+        <img
+          src={avatarUrl}
+          alt="Avatar"
+          className="w-24 h-24 rounded-full mx-auto mb-4 shadow-md"
+        />
+        <h1 className="text-3xl font-bold mb-1 text-gray-800">{username}</h1>
+        <p className="text-gray-500 mb-4">{email}</p>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold">Articles de {user.name}</h2>
-        {articles.length === 0 ? (
-          <p className="text-gray-500">Aucun article publié.</p>
-        ) : (
-          <div className="grid gap-4">
-            {articles.map((a) => (
-              <div key={a.id} className="border p-4 rounded shadow-sm">
-                <h3 className="text-xl font-medium">{a.titre}</h3>
-                <p className="text-sm text-gray-500">
-                  Publié le {new Date(a.date).toLocaleDateString()}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="bg-gray-50 p-4 rounded-lg border mb-6 text-left">
+          <h2 className="text-lg font-semibold text-gray-700 mb-2">Bio</h2>
+          <p className="text-gray-600">{bio}</p>
+        </div>
+
+        <div className="flex justify-center space-x-4">
+          <button
+            onClick={handleEdit}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          >
+            Modifier
+          </button>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+          >
+            Supprimer
+          </button>
+        </div>
       </div>
     </div>
   );

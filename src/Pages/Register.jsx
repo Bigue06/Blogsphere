@@ -30,7 +30,7 @@ const Register = () => {
 
     localStorage.setItem("user", JSON.stringify({ username, email }));
     alert("Inscription réussie ! Bienvenue !");
-    navigate("/profile");
+    navigate("/login");
   };
 
   const handleRegister = async (e) => {
