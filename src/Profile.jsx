@@ -5,12 +5,40 @@ import axios from "axios";
 const Profile = () => {
   const navigate = useNavigate();
 
-  const [avatar, setAvatar] = useState(localStorage.getItem("avatar") || "");
-  const [bio, setBio] = useState(localStorage.getItem("bio") || "Décrivez-vous ici...");
-  const username = localStorage.getItem("username");
-  const email = localStorage.getItem("email");
+  const [avatar, setAvatar] = useState("");
+  const [bio, setBio] = useState("Décrivez-vous ici...");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
 
   const avatarUrl = avatar || `https://ui-avatars.com/api/?name=${username}`;
+
+  // 🔄 Récupérer les infos du backend
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return navigate("/login");
+
+      try {
+        const res = await axios.get("http://localhost:5000/api/user/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const { avatar, bio, username, email } = res.data.user;
+
+        setAvatar(avatar || "");
+        setBio(bio || "Décrivez-vous ici...");
+        setUsername(username || "");
+        setEmail(email || "");
+      } catch (err) {
+        console.error("Erreur récupération profil :", err);
+        navigate("/login");
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -20,17 +48,13 @@ const Profile = () => {
     reader.onloadend = async () => {
       const base64Image = reader.result;
       setAvatar(base64Image);
-      localStorage.setItem("avatar", base64Image);
-
       await updateProfile(base64Image, bio);
     };
     reader.readAsDataURL(file);
   };
 
   const handleBioChange = (e) => {
-    const newBio = e.target.value;
-    setBio(newBio);
-    localStorage.setItem("bio", newBio);
+    setBio(e.target.value);
   };
 
   const updateProfile = async (avatarToSend, bioToSend) => {
@@ -50,24 +74,16 @@ const Profile = () => {
         }
       );
 
-      console.log("✅ Profil mis à jour côté serveur");
+      console.log("✅ Profil mis à jour");
     } catch (error) {
-      console.error("❌ Erreur lors de la mise à jour du profil :", error);
+      console.error("❌ Erreur mise à jour :", error);
     }
-  };
-
-  const handleEdit = () => {
-    navigate("/edit-profile");
   };
 
   const handleDelete = () => {
     const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer votre profil ?");
     if (confirmDelete) {
-      localStorage.removeItem("username");
-      localStorage.removeItem("email");
-      localStorage.removeItem("avatar");
-      localStorage.removeItem("bio");
-      localStorage.removeItem("token");
+      localStorage.clear();
       navigate("/login");
     }
   };
@@ -103,7 +119,7 @@ const Profile = () => {
 
         <div className="flex justify-center space-x-4">
           <button
-            onClick={handleEdit}
+            onClick={() => navigate("/edit-profile")}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
           >
             Modifier
