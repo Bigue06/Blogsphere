@@ -1,39 +1,42 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
+import { createArticle } from "./Api/articleAPI"; // Assure-toi que ce chemin est correct
 const Editor = () => {
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null); 
   const [content, setContent] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
 
-    if (!title || !content) {
-      alert("Titre et contenu obligatoires !");
-      return;
-    }
-
-    try {
-      const newArticle = {
-        title,
-        content,
-        image,
-        likes: 0,
-        comments: [],
-      };
-
-      await axios.post("http://localhost:5000/api/articles", newArticle);
-
-      alert("Article publié avec succès !");
-      navigate("/articles"); // Redirige vers la liste des articles
-    } catch (error) {
-      console.error("Erreur lors de la publication :", error);
-      alert("Erreur lors de la publication");
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setImagePreview(objectUrl);
     }
   };
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+
+    const response = await createArticle(formData);
+    console.log("Article créé avec succès:", response);
+    alert("Article publié !");
+    navigate("/dashboard");
+  } catch (error) {
+    console.error("Erreur lors de la création de l'article :", error);
+    alert("Échec de la création de l'article. Vérifie le serveur.");
+  }
+};
+
+
 
   return (
     <div className="max-w-3xl mx-auto mt-10 p-4 bg-white rounded shadow">
@@ -52,12 +55,21 @@ const Editor = () => {
         />
 
         <input
-          type="text"
-          placeholder="URL de l'image (facultatif)"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
           className="w-full border border-gray-300 rounded p-2"
         />
+
+        {imagePreview && (
+          <div className="my-4">
+            <img
+              src={imagePreview}
+              alt="Aperçu de l'image"
+              className="w-full h-auto rounded-md"
+            />
+          </div>
+        )}
 
         <textarea
           rows="10"

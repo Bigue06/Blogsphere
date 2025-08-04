@@ -9,7 +9,7 @@ import Profile from "./Profile";
 import Dashboard from "./Dashboard";
 import Deconnexion from "./Pages/Deconnexion";
 import EditProfile from "./Pages/EditProfile";
-import Article from "./Pages/Article";  // Vérifie que ce fichier existe et est correctement nommé
+import Article from "./Pages/Article";  
 
 import Editor from "./Editor"; 
 
