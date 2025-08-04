@@ -1,40 +1,93 @@
-import React from "react";
-import ArticleCard from "../components/ArticlesCard";
-
+import React, { useState } from "react";
+import {
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+  Edit,
+  Trash2
+} from "lucide-react";
 
 const Articles = () => {
-  const articles = [
+  const initialArticles = [
     {
       _id: "abc123",
       image: "https://www.stackct.com/wp-content/uploads/2022/12/STACKEwing.jpg.webp",
       category: "Software Engineering",
       title: "Building your API Stack",
-      description:  "Construire votre pile d'API Cela fait référence au processus de sélection, d intégration et de gestion de différentes API pour créer une solution logicielle complète et fonctionnelle...",
+      description: "Une interface de programmation d'application (API) est un ensemble de protocoles permettant de créer des applications...",
       author: "Lana Steiner",
       authorAvatar: "https://i.pravatar.cc/100?img=8",
-      date: "18 Jan 2022"
+      date: "18 Jan 2022",
+      likes: 0,
+      dislikes: 0,
+      comments: []
     },
     {
       _id: "abc124",
-      image: "https://www.google.com/imgres?q=Migration%20vers%20Linear%20%3A%20les%20bases%20donne%20moi%20une%20image&imgurl=https%3A%2F%2Fafricacenter.org%2Fwp-content%2Fuploads%2F2024%2F01%2FMigration_2024_3x2.jpg&imgrefurl=https%3A%2F%2Fafricacenter.org%2Ffr%2Fspotlight%2Ftendances-migratoire-a-surveiller-en-afrique-en-2024%2F&docid=Pujc4Uzqx2dohM&tbnid=NexsiMLWMVGr4M&vet=12ahUKEwjYld6xp_GOAxX7RaQEHaw7A0AQM3oECE8QAA..i&w=1800&h=1200&hcb=2&ved=2ahUKEwjYld6xp_GOAxX7RaQEHaw7A0AQM3oECE8QAA",
+      image: "https://africacenter.org/wp-content/uploads/2024/01/Migration_2024_3x2.jpg",
       category: "Product",
       title: "Migrating to Linear 101",
-      description: "Linear est un outil puissant qui peut simplifier la gestion de projet pour les équipes modernes. Réputé pour sa rapidité, sa simplicité et son focus, Linear aide les développeurs et autres professionnels à gérer les tâches, suivre les problèmes et collaborer efficacement.",
+      description: "Linear est un outil puissant qui peut simplifier la gestion de projet pour les équipes modernes...",
       author: "Phoenix Baker",
       authorAvatar: "https://i.pravatar.cc/100?img=7",
-      date: "19 Jan 2022"
+      date: "19 Jan 2022",
+      likes: 0,
+      dislikes: 0,
+      comments: []
     },
     {
       _id: "abc125",
-      image: "https://www.google.com/imgres?q=How%20do%20you%20create%20compelling%20presentations%20that%20wow%20your%20colleagues..%20donne%20moi%20cette%20image&imgurl=https%3A%2F%2Fstatic-cse.canva.com%2Fblob%2F1315953%2FPresentation.png&imgrefurl=https%3A%2F%2Fwww.canva.com%2Flearn%2Fbeginners-guide-to-creating-more-engaging-presentations%2F&docid=vMJ3eughZtBESM&tbnid=pxzdbEKwVYhsSM&vet=12ahUKEwiRn5_BqPGOAxUeU6QEHYDFKygQM3oECBQQAA..i&w=1611&h=1080&hcb=2&ved=2ahUKEwiRn5_BqPGOAxUeU6QEHYDFKygQM3oECBQQAA",
+      image: "https://static-cse.canva.com/blob/1315953/Presentation.png",
       category: "Design",
       title: "UX Review Presentations",
-      description: "Pour créer une présentation percutante qui impressionnera vos collègues, il est essentiel de bien la préparer et de la rendre engageante. Cela implique de choisir un sujet clair et pertinent, de structurer votre contenu....",
+      description: "Pour créer une présentation percutante qui impressionnera vos collègues...",
       author: "Olivia Rhye",
       authorAvatar: "https://i.pravatar.cc/100?img=6",
-      date: "20 Jan 2022"
+      date: "20 Jan 2022",
+      likes: 0,
+      dislikes: 0,
+      comments: []
     }
   ];
+
+  const [articles, setArticles] = useState(initialArticles);
+  const [newComment, setNewComment] = useState("");
+
+  const handleLike = (id) => {
+    setArticles((prev) =>
+      prev.map((article) =>
+        article._id === id ? { ...article, likes: article.likes + 1 } : article
+      )
+    );
+  };
+
+  const handleDislike = (id) => {
+    setArticles((prev) =>
+      prev.map((article) =>
+        article._id === id ? { ...article, dislikes: article.dislikes + 1 } : article
+      )
+    );
+  };
+
+  const handleAddComment = (id) => {
+    if (newComment.trim()) {
+      setArticles((prev) =>
+        prev.map((article) =>
+          article._id === id
+            ? {
+                ...article,
+                comments: [...article.comments, newComment]
+              }
+            : article
+        )
+      );
+      setNewComment(""); // Clear the comment input
+    }
+  };
+
+  const handleDelete = (id) => {
+    setArticles((prev) => prev.filter((article) => article._id !== id));
+  };
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -42,7 +95,67 @@ const Articles = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {articles.map((article) => (
-          <ArticleCard key={article._id} article={article} />
+          <div key={article._id} className="bg-white shadow-md rounded-lg overflow-hidden">
+            <img src={article.image} alt={article.title} className="w-full h-48 object-cover" />
+            <div className="p-4">
+              <h3 className="text-sm text-indigo-500">{article.category}</h3>
+              <h2 className="text-xl font-bold mb-2">{article.title}</h2>
+              <p className="text-gray-700 mb-4">{article.description}</p>
+              <div className="flex items-center mb-4">
+                <img src={article.authorAvatar} alt={article.author} className="w-8 h-8 rounded-full mr-2" />
+                <div>
+                  <p className="text-sm font-semibold">{article.author}</p>
+                  <p className="text-xs text-gray-500">{article.date}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center text-gray-600 text-sm">
+                <button onClick={() => handleLike(article._id)} className="flex items-center gap-1 hover:text-green-600">
+                  <ThumbsUp size={18} /> {article.likes}
+                </button>
+                <button onClick={() => handleDislike(article._id)} className="flex items-center gap-1 hover:text-red-600">
+                  <ThumbsDown size={18} /> {article.dislikes}
+                </button>
+                <button onClick={() => handleAddComment(article._id)} className="flex items-center gap-1 hover:text-blue-600">
+                  <MessageCircle size={18} />
+                </button>
+                <button className="hover:text-yellow-600">
+                  <Edit size={18} />
+                </button>
+                <button onClick={() => handleDelete(article._id)} className="hover:text-black">
+                  <Trash2 size={18} />
+                </button>
+              </div>
+
+              {/* Affichage des commentaires */}
+              <div className="mt-4">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Ajouter un commentaire..."
+                />
+                <button
+                  onClick={() => handleAddComment(article._id)}
+                  className="mt-2 bg-blue-500 text-white py-1 px-4 rounded-md"
+                >
+                  Ajouter un commentaire
+                </button>
+
+                {/* Liste des commentaires */}
+                {article.comments.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="font-semibold">Commentaires:</h4>
+                    <ul className="list-disc pl-5">
+                      {article.comments.map((comment, index) => (
+                        <li key={index} className="text-sm text-gray-700">{comment}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </div>
