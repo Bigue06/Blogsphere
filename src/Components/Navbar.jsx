@@ -1,40 +1,46 @@
-import React from 'react'
-    import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom"; // 
-
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const isAuthenticated = localStorage.getItem("token");
 
-  const handleDeconnexion = () => {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("username");
+    alert("Déconnexion réussie !");
     navigate("/login");
   };
+
   return (
-   <div className="bg-indigo-800 text-white flex justify-between items-center p-4">
+    <div className="bg-black text-white flex justify-between items-center p-4">
+      <img 
+        src="src/Api/speech-bubble-dialog-illustration-business-600nw-306465737-removebg-preview.png" 
+        alt="BlogSphere Logo" 
+        className="h-8" 
+      />
 
-      <div>logo</div>
-      <div>
-        <ul className='flex space-x-4'>
-          <Link to={"/home"}>Home</Link> 
-          <Link to={"editor"}> Articles</Link>
+      <ul className="flex space-x-4 items-center">
+        <Link to="/home">Home</Link>
+        <Link to="/articles">Articles</Link>
+        <Link to="/dashboard">Dashboard</Link>
+        <Link to="/profile">Profile</Link>
 
-          <Link to={"/dashboard"}> Dashboard</Link>
-
-
-          <Link to={"/Profile"}> Profile</Link>
-          
-          
-          <Link to={"/login"}>Connexion</Link> 
-          <Link to={"/register"}>Inscription</Link>
-           
-
-          <button onClick={handleDeconnexion}> Deconnexion</button>
-        </ul>
-  
-
-
-
-      </div>
+        {isAuthenticated ? (
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+          >
+            Déconnexion
+          </button>
+        ) : (
+          <>
+            <Link to="/login">Connexion</Link>
+            <Link to="/register">Inscription</Link>
+          </>
+        )}
+      </ul>
     </div>
   );
 };

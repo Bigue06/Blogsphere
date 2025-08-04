@@ -24,7 +24,7 @@ const Dashboard = () => {
         console.error("Erreur lors du chargement du profil :", err)
       );
 
-    // Charger les articles de l'utilisateur
+  
     fetch(`http://localhost:5000/api/articles/user/${storedUser}`)
       .then((res) => res.json())
       .then((data) => setArticles(data))

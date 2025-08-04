@@ -1,14 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const navigate = useNavigate();
 
+  const [avatar, setAvatar] = useState(localStorage.getItem("avatar"));
   const username = localStorage.getItem("username");
   const email = localStorage.getItem("email");
-  const avatarUrl =
-    localStorage.getItem("avatar") || "https://ui-avatars.com/api/?name=" + username;
   const bio = localStorage.getItem("bio") || "Décrivez-vous ici...";
+
+  const avatarUrl = avatar || `https://ui-avatars.com/api/?name=${username}`;
+
+  // 🔹 Quand on change d’image
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Image = reader.result;
+      setAvatar(base64Image);
+      localStorage.setItem("avatar", base64Image);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleEdit = () => {
     navigate("/edit-profile");
@@ -21,7 +36,6 @@ const Profile = () => {
       localStorage.removeItem("email");
       localStorage.removeItem("avatar");
       localStorage.removeItem("bio");
-
       navigate("/login");
     }
   };
@@ -32,8 +46,17 @@ const Profile = () => {
         <img
           src={avatarUrl}
           alt="Avatar"
-          className="w-24 h-24 rounded-full mx-auto mb-4 shadow-md"
+          className="w-24 h-24 rounded-full mx-auto mb-4 shadow-md object-cover"
         />
+
+        {/* 🔹 Upload de nouvelle image */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="mb-4 mx-auto text-sm"
+        />
+
         <h1 className="text-3xl font-bold mb-1 text-gray-800">{username}</h1>
         <p className="text-gray-500 mb-4">{email}</p>
 

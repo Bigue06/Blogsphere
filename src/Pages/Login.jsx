@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../Api/authAPI'; 
+import { loginUser } from '../Api/authAPI'; // Assure-toi que le chemin est bon
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const connexion = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
       const response = await loginUser({ email, password });
       console.log('Connexion réussie:', response);
 
-     
+      // Sauvegarde dans le localStorage
       localStorage.setItem('token', response.token);
       localStorage.setItem('username', response.user.username);
       localStorage.setItem('email', response.user.email);
 
-    
+      // Réinitialisation des champs
       setEmail('');
       setPassword('');
 
-    
-      navigate('/Profile');
+      // Redirection après connexion
+      navigate('/profile');
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
       alert('Identifiants invalides ou erreur serveur.');
@@ -35,9 +35,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 px-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Connexion à votre compte</h1>
-        <form onSubmit={connexion} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label htmlFor="email">Adresse Email</label>
+            <label htmlFor="email" className="block text-gray-600">Adresse Email</label>
             <input
               id="email"
               type="email"
@@ -48,7 +48,7 @@ const Login = () => {
             />
           </div>
           <div>
-            <label htmlFor="password">Mot de passe</label>
+            <label htmlFor="password" className="block text-gray-600">Mot de passe</label>
             <input
               id="password"
               type="password"
@@ -58,7 +58,7 @@ const Login = () => {
               required
             />
           </div>
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg">
+          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
             Se connecter
           </button>
         </form>
