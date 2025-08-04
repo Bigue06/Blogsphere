@@ -1,28 +1,59 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Profile = () => {
   const navigate = useNavigate();
 
-  const [avatar, setAvatar] = useState(localStorage.getItem("avatar"));
+  const [avatar, setAvatar] = useState(localStorage.getItem("avatar") || "");
+  const [bio, setBio] = useState(localStorage.getItem("bio") || "Décrivez-vous ici...");
   const username = localStorage.getItem("username");
   const email = localStorage.getItem("email");
-  const bio = localStorage.getItem("bio") || "Décrivez-vous ici...";
 
   const avatarUrl = avatar || `https://ui-avatars.com/api/?name=${username}`;
 
-  // 🔹 Quand on change d’image
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       const base64Image = reader.result;
       setAvatar(base64Image);
       localStorage.setItem("avatar", base64Image);
+
+      await updateProfile(base64Image, bio);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleBioChange = (e) => {
+    const newBio = e.target.value;
+    setBio(newBio);
+    localStorage.setItem("bio", newBio);
+  };
+
+  const updateProfile = async (avatarToSend, bioToSend) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        "http://localhost:5000/api/user/update",
+        {
+          avatar: avatarToSend,
+          bio: bioToSend,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("✅ Profil mis à jour côté serveur");
+    } catch (error) {
+      console.error("❌ Erreur lors de la mise à jour du profil :", error);
+    }
   };
 
   const handleEdit = () => {
@@ -36,6 +67,7 @@ const Profile = () => {
       localStorage.removeItem("email");
       localStorage.removeItem("avatar");
       localStorage.removeItem("bio");
+      localStorage.removeItem("token");
       navigate("/login");
     }
   };
@@ -49,7 +81,6 @@ const Profile = () => {
           className="w-24 h-24 rounded-full mx-auto mb-4 shadow-md object-cover"
         />
 
-        {/* 🔹 Upload de nouvelle image */}
         <input
           type="file"
           accept="image/*"
@@ -62,7 +93,12 @@ const Profile = () => {
 
         <div className="bg-gray-50 p-4 rounded-lg border mb-6 text-left">
           <h2 className="text-lg font-semibold text-gray-700 mb-2">Bio</h2>
-          <p className="text-gray-600">{bio}</p>
+          <textarea
+            value={bio}
+            onChange={handleBioChange}
+            onBlur={() => updateProfile(avatar, bio)}
+            className="w-full p-2 border rounded text-sm text-gray-700"
+          />
         </div>
 
         <div className="flex justify-center space-x-4">
