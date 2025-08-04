@@ -2,16 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_URL_LOGOUT = 'http://localhost:5000/api/user/logout'; // Remplace par ton vrai endpoint
+
 const Deconnexion = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await axios.post(API_URL_LOGOUT); 
+      await axios.post(API_URL_LOGOUT);
       localStorage.removeItem('user');
-      localStorage.removeItem('token'); 
+      localStorage.removeItem('token');
       localStorage.removeItem('username');
-      
 
       alert("Déconnexion réussie !");
       navigate('/login');

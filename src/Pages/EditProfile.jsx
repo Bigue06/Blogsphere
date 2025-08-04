@@ -15,7 +15,7 @@ const EditProfile = () => {
     localStorage.setItem("email", email);
     localStorage.setItem("avatar", avatar);
     localStorage.setItem("bio", bio);
-    navigate("/profile"); // Redirige vers le profil
+    navigate("/profile"); 
   };
 
   return (
