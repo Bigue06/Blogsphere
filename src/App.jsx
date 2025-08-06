@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -9,9 +8,8 @@ import Profile from "./Profile";
 import Dashboard from "./Dashboard";
 import Deconnexion from "./Pages/Deconnexion";
 import EditProfile from "./Pages/EditProfile";
-import Article from "./Pages/Article";  
-
-import Editor from "./Editor"; 
+import Article from "./Pages/Article";
+import Editor from "./Editor";
 
 import Layout from "./Layout/Layout";
 import PrivateRoute from "./components/PrivateRoute";
@@ -20,11 +18,13 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        {/* Routes publiques */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
         <Route index element={<Home />} />
 
+        {/* Routes privées avec Layout */}
         <Route path="/" element={<Layout />}>
           <Route
             path="dashboard"
@@ -67,10 +67,18 @@ const App = () => {
             }
           />
           <Route
+            path="editor/:id"
+            element={
+              <PrivateRoute>
+                <Editor />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="articles"
             element={
               <PrivateRoute>
-                <Article />  {/* Assure-toi que le fichier Article.jsx existe et est correctement importé */}
+                <Article />
               </PrivateRoute>
             }
           />

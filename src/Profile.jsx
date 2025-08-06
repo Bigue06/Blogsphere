@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const navigate = useNavigate();
 
-<<<<<<< HEAD
   const [avatar, setAvatar] = useState("");
   const [bio, setBio] = useState("Décrivez-vous ici...");
   const [username, setUsername] = useState("");
@@ -12,7 +12,7 @@ const Profile = () => {
 
   const avatarUrl = avatar || `https://ui-avatars.com/api/?name=${username}`;
 
-  // 🔄 Récupérer les infos du backend
+  // 🔄 Récupérer les infos du backend au chargement du composant
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
@@ -40,45 +40,33 @@ const Profile = () => {
     fetchProfile();
   }, [navigate]);
 
-  const handleImageChange = async (e) => {
-=======
-  const [avatar, setAvatar] = useState(localStorage.getItem("avatar"));
-  const username = localStorage.getItem("username");
-  const email = localStorage.getItem("email");
-  const bio = localStorage.getItem("bio") || "Décrivez-vous ici...";
-
-  const avatarUrl = avatar || `https://ui-avatars.com/api/?name=${username}`;
-
   // 🔹 Quand on change d’image
   const handleImageChange = (e) => {
->>>>>>> c135032fbd1ccbf2a14d2415ba179d4f70d4ecb3
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       const base64Image = reader.result;
       setAvatar(base64Image);
-<<<<<<< HEAD
+
+      // Met à jour le profil backend avec la nouvelle image et bio
       await updateProfile(base64Image, bio);
-=======
-      localStorage.setItem("avatar", base64Image);
->>>>>>> c135032fbd1ccbf2a14d2415ba179d4f70d4ecb3
     };
     reader.readAsDataURL(file);
   };
 
-<<<<<<< HEAD
   const handleBioChange = (e) => {
     setBio(e.target.value);
   };
 
+  // Fonction pour mettre à jour profil backend
   const updateProfile = async (avatarToSend, bioToSend) => {
     try {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        "http://localhost:5000/api/user/update",
+        "http://localhost:5000/api/user/profile", // ✅ corrigé ici
         {
           avatar: avatarToSend,
           bio: bioToSend,
@@ -94,23 +82,14 @@ const Profile = () => {
     } catch (error) {
       console.error("❌ Erreur mise à jour :", error);
     }
-=======
-  const handleEdit = () => {
-    navigate("/edit-profile");
->>>>>>> c135032fbd1ccbf2a14d2415ba179d4f70d4ecb3
   };
 
   const handleDelete = () => {
-    const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer votre profil ?");
+    const confirmDelete = window.confirm(
+      "Êtes-vous sûr de vouloir supprimer votre profil ?"
+    );
     if (confirmDelete) {
-<<<<<<< HEAD
       localStorage.clear();
-=======
-      localStorage.removeItem("username");
-      localStorage.removeItem("email");
-      localStorage.removeItem("avatar");
-      localStorage.removeItem("bio");
->>>>>>> c135032fbd1ccbf2a14d2415ba179d4f70d4ecb3
       navigate("/login");
     }
   };
@@ -124,7 +103,7 @@ const Profile = () => {
           className="w-24 h-24 rounded-full mx-auto mb-4 shadow-md object-cover"
         />
 
-        {/* 🔹 Upload de nouvelle image */}
+        {/* Upload de nouvelle image */}
         <input
           type="file"
           accept="image/*"
@@ -137,7 +116,12 @@ const Profile = () => {
 
         <div className="bg-gray-50 p-4 rounded-lg border mb-6 text-left">
           <h2 className="text-lg font-semibold text-gray-700 mb-2">Bio</h2>
-          <p className="text-gray-600">{bio}</p>
+          <textarea
+            value={bio}
+            onChange={handleBioChange}
+            className="w-full p-2 border rounded resize-none"
+            rows={4}
+          />
         </div>
 
         <div className="flex justify-center space-x-4">
